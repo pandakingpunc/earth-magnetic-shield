@@ -1,6 +1,6 @@
 **Türkçe** | [English](README.en.md)
 
-<!-- DOI: Zenodo DOI'si eklenecek -->
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23297412.svg)](https://doi.org/10.5281/zenodo.23297412)
 
 # 🌍 Manyetik Kalkan — Dünya'nın Manyetosfer Simülasyonu
 
@@ -94,7 +94,7 @@ docs/        mimari ve modül sözleşmeleri
 
 Bu yazılımı kullanırsan lütfen şöyle atıf yap (ayrıntılar: [CITATION.cff](CITATION.cff)):
 
-> Karatum, M. (2026). *Earth Magnetic Shield (Manyetik Kalkan): Interactive 3D Magnetosphere and Space-Weather Simulation* (Sürüm 1.0.0) [Yazılım]. Zenodo. DOI: _eklenecek_
+> Karatum, M. (2026). *Earth Magnetic Shield (Manyetik Kalkan): Interactive 3D Magnetosphere and Space-Weather Simulation* (Sürüm 1.0.0) [Yazılım]. Zenodo. [https://doi.org/10.5281/zenodo.23297412](https://doi.org/10.5281/zenodo.23297412)
 
 ## Lisans
 

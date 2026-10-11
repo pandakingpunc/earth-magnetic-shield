@@ -9,7 +9,11 @@ version: 1.0.0
 date-released: 2026-10-11
 license: MIT
 repository-code: "https://github.com/pandakingpunc/earth-magnetic-shield"
-# doi: 10.5281/zenodo.XXXXXXX  (Zenodo DOI eklenecek)
+doi: 10.5281/zenodo.23297412
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23297412
+    description: Zenodo arşivi (v1.0.0)
 abstract: >-
   Interactive browser-based 3D simulation of Earth's magnetosphere: solar storms
   (flare, solar energetic particles, CME), cosmic-ray trajectories in the

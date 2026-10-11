@@ -1,6 +1,6 @@
 # Devir: sıradaki görevler
 
-**Durum (11 Ekim 2026):** Görev 1–3 tamamlandı. Yalnızca **Görev 4** (kullanıcı DOI'yi verince) bekliyor.
+**Durum (11 Ekim 2026):** Dört görevin tamamı bitti. Zenodo DOI: [10.5281/zenodo.23297412](https://doi.org/10.5281/zenodo.23297412).
 
 Bu dosya, projeye yeni bir Claude Code oturumunda devam etmek içindir. Görevleri **sırayla** yap. Her görev
 bitince kullanıcıya kısa bir Türkçe özet ver ve bir sonrakine geç.
