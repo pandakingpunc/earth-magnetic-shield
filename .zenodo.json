@@ -1,0 +1,28 @@
+{
+  "title": "Earth Magnetic Shield (Manyetik Kalkan): Interactive 3D Magnetosphere and Space-Weather Simulation",
+  "upload_type": "software",
+  "version": "1.0.0",
+  "access_right": "open",
+  "license": "mit",
+  "language": "eng",
+  "creators": [
+    {
+      "name": "Karatum, Mustafa"
+    }
+  ],
+  "description": "<p>An interactive, browser-based 3D simulation of Earth's magnetic shield (the magnetosphere), built with Three.js. Users can trigger solar storms and cosmic-ray bursts, adjust their strength, and watch how the magnetopause compresses, how charged particles are deflected or funnelled to the poles, how the aurora spreads to lower latitudes and how space weather affects technology.</p><p>Physics models: Shue et al. (1998) magnetopause; Spreiter / Farris &amp; Russell bow shock; Rankine half-body magnetosheath flow; Newell et al. (2007, 2008) solar-wind coupling and Kp; O'Brien &amp; McPherron (2000) ring current (Dst); Starkov auroral boundary; Carpenter &amp; Anderson (1992) plasmapause; Störmer cutoff theory and a relativistic Boris pusher for cosmic-ray trajectories in a dipole field.</p><p>Features: flare → solar energetic particles → CME storm sequence with NOAA G/S/R scales; historical presets (Carrington 1859, Québec 1989, Halloween 2003, Gannon/May 2024); Van Allen belts with trapped-particle gyration, bounce and drift; animated auroral ovals; ISS, GPS and GEO satellites (including Türksat) with magnetopause-exposure warnings; South Atlantic Anomaly; pole reversal, Laschamp excursion and 'no magnetic field' scenarios; live Dst/Kp/Bz charts; bilingual Turkish/English interface with educational explanations.</p><p>This is an educational tool: distances are not to scale, time scales are compressed and technological impact estimates are rough approximations.</p>",
+  "keywords": [
+    "magnetosphere",
+    "space weather",
+    "solar storm",
+    "coronal mass ejection",
+    "cosmic rays",
+    "Van Allen belts",
+    "aurora",
+    "geomagnetic storm",
+    "three.js",
+    "simulation",
+    "education"
+  ],
+  "notes": "Live in the browser: run `npm install` and `npm run dev`. User interface available in Turkish and English."
+}

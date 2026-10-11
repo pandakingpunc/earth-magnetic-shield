@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.vite/
+*.log
+.DS_Store
+Thumbs.db
+
+# Yerel / geçici
+.claude/settings.local.json
+tmp_*
+*.tmp

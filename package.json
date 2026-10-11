@@ -1,0 +1,41 @@
+{
+  "name": "earth-magnetic-shield",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive 3D simulation of Earth's magnetic shield (magnetosphere): solar storms, cosmic rays, Van Allen belts and aurora. TR/EN.",
+  "license": "MIT",
+  "author": "Mustafa Karatum",
+  "homepage": "https://github.com/pandakingpunc/earth-magnetic-shield#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pandakingpunc/earth-magnetic-shield.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pandakingpunc/earth-magnetic-shield/issues"
+  },
+  "keywords": [
+    "magnetosphere",
+    "space-weather",
+    "solar-storm",
+    "cosmic-rays",
+    "aurora",
+    "threejs",
+    "simulation",
+    "education"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "happy-dom": "20.14.6",
+    "vite": "8.3.4",
+    "vitest": "5.0.3"
+  }
+}

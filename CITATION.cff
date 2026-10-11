@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Earth Magnetic Shield (Manyetik Kalkan): Interactive 3D Magnetosphere and Space-Weather Simulation"
+authors:
+  - family-names: Karatum
+    given-names: Mustafa
+version: 1.0.0
+date-released: 2026-10-11
+license: MIT
+repository-code: "https://github.com/pandakingpunc/earth-magnetic-shield"
+# doi: 10.5281/zenodo.XXXXXXX  (Zenodo DOI eklenecek)
+abstract: >-
+  Interactive browser-based 3D simulation of Earth's magnetosphere: solar storms
+  (flare, solar energetic particles, CME), cosmic-ray trajectories in the
+  geomagnetic field, Van Allen belts, aurora, satellites and space-weather
+  indices (Kp, Dst, NOAA G/S/R), with a Turkish/English educational interface.
+keywords:
+  - magnetosphere
+  - space weather
+  - solar storm
+  - cosmic rays
+  - Van Allen belts
+  - aurora
+  - simulation
+  - education

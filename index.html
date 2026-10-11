@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Dünya'nın manyetik kalkanının etkileşimli 3B simülasyonu: güneş fırtınaları, kozmik ışınlar, Van Allen kuşakları ve auroralar." />
+    <title>Manyetik Kalkan</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='14' fill='%233fa9ff'/%3E%3Cpath d='M32 6c-16 0-26 12-26 26s10 26 26 26M32 6c16 0 26 12 26 26S48 58 32 58' fill='none' stroke='%2359c8ff' stroke-width='3'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <header id="topbar"></header>
+    <aside id="panel" aria-label="Kontrol paneli"></aside>
+    <aside id="hud" aria-label="Uzay havası verileri"></aside>
+    <section id="bottom">
+      <div id="charts"></div>
+      <div id="log"></div>
+    </section>
+    <div id="toasts" aria-live="polite"></div>
+    <div id="info-modal" hidden></div>
+
+    <div id="loading">
+      <div class="loading-orb"></div>
+      <div class="loading-title">Manyetik Kalkan</div>
+      <div id="loading-text">Başlatılıyor…</div>
+    </div>
+
+    <!-- Türkçe metinler yedektir. Dil seçimi i18n/index.js ile aynı sırayı izler (URL ?lang → localStorage → tarayıcı dili);
+         yükleme ekranı JS paketi inmeden önce de doğru dilde görünsün. Sayfanın geri kalanını main.js etkin dile çevirir. -->
+    <script>
+      (function () {
+        var lang = null;
+        try {
+          var q = new URLSearchParams(location.search).get('lang');
+          if (q && /^(tr|en)$/i.test(q)) lang = q.toLowerCase();
+        } catch (e) {}
+        if (!lang) {
+          try {
+            var saved = localStorage.getItem('lang');
+            if (saved && /^(tr|en)$/i.test(saved)) lang = saved.toLowerCase();
+          } catch (e) {}
+        }
+        if (!lang) lang = /^tr\b/i.test(navigator.language || '') ? 'tr' : 'en';
+        document.documentElement.lang = lang;
+        if (lang !== 'en') return;
+        document.title = 'Magnetic Shield';
+        var title = document.querySelector('#loading .loading-title');
+        var text = document.getElementById('loading-text');
+        if (title) title.textContent = 'Magnetic Shield';
+        if (text) text.textContent = 'Starting…';
+      })();
+    </script>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
