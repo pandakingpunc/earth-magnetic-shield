@@ -12,6 +12,10 @@ particles, how auroras spread, and how it all affects technology.
 
 ## Features
 
+**Live space weather (v1.1)**
+- "What is Earth's shield doing right now?" mode driven by NOAA SWPC real-time solar-wind, IMF and Kp data (L1 spacecraft, refreshed every 5 minutes; the clock runs in real UTC)
+- Shareable scenario links (`?preset=carrington1859`), PNG screenshots (P), automatic quality scaling, keyboard and screen-reader support
+
 **Solar storms**
 - Trigger a storm with the strength slider (Weak → Carrington class): X-ray flare → solar energetic particles (SEP) → coronal mass ejection (CME)
 - Time automatically speeds up during the CME's journey; when the shock arrives, the magnetopause visibly compresses

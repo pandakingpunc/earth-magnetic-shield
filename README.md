@@ -12,6 +12,10 @@ nasıl saptırdığını, auroraların nasıl yayıldığını ve teknolojiye et
 
 ## Özellikler
 
+**Canlı uzay havası (v1.1)**
+- NOAA SWPC gerçek zamanlı güneş rüzgârı, IMF ve Kp verisiyle "Dünya'nın kalkanı şu an ne durumda?" modu (L1 uydusu verisi, 5 dakikada bir güncellenir; saat gerçek UTC'de akar)
+- Paylaşılabilir senaryo bağlantısı (`?preset=carrington1859`), PNG ekran görüntüsü (P), otomatik kalite ayarı, klavye ve ekran okuyucu desteği
+
 **Güneş fırtınaları**
 - Güç kaydırıcısıyla (Zayıf → Carrington sınıfı) fırtına tetikleme: X-ışını patlaması → güneş enerjik parçacıkları (SEP) → koronal kütle atımı (CME)
 - CME yolculuğu sırasında zaman otomatik hızlanır; şok varışında manyetopoz gözle görülür biçimde sıkışır
