@@ -4,7 +4,7 @@
   "private": true,
   "description": "Interactive 3D simulation of Earth's magnetic shield (magnetosphere): solar storms, cosmic rays, Van Allen belts and aurora. TR/EN.",
   "license": "MIT",
-  "author": "Mustafa Karatum",
+  "author": "Mustafa Karatüm",
   "homepage": "https://github.com/pandakingpunc/earth-magnetic-shield#readme",
   "repository": {
     "type": "git",

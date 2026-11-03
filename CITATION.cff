@@ -3,8 +3,9 @@ message: "If you use this software, please cite it as below."
 type: software
 title: "Earth Magnetic Shield (Manyetik Kalkan): Interactive 3D Magnetosphere and Space-Weather Simulation"
 authors:
-  - family-names: Karatum
+  - family-names: Karatüm
     given-names: Mustafa
+    orcid: "https://orcid.org/0009-0006-7053-2872"
 version: 1.0.0
 date-released: 2026-10-11
 license: MIT

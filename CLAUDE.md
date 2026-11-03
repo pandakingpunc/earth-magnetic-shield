@@ -9,6 +9,7 @@ güç ayarları, Van Allen kuşakları, auroralar, uydular, kutup tersinmesi, ta
 
 - Kullanıcı Türkçe konuşur; ona Türkçe yanıt ver.
 - Alt ajanlar (Agent aracı / Workflow `agent()`) **Sonnet 5.5** ile çalıştırılmalı (`model: 'sonnet'`). Kullanıcının açık isteği.
+- Varsayılan iş bölümü (2026-11-03): Opus planlar, görevleri böler ve doğrular; kodu Sonnet 5.5 alt ajanları yazar. Kullanıcı "kodu sen yaz" derse Opus yazar.
 - Belirsiz bir karar varsa (ör. depo adı, yazar adı) kullanıcıya **sor**; tahmin edip dışa dönük işlem yapma.
 
 ## Komutlar
@@ -52,6 +53,6 @@ yakalanmaz; mümkünse tarayıcıda konsolu kontrol et.
 
 ## Git
 
-- Depo: https://github.com/pandakingpunc/earth-magnetic-shield (açık, `main` dalı). Lisans: MIT © 2026 Mustafa Karatum.
+- Depo: https://github.com/pandakingpunc/earth-magnetic-shield (açık, `main` dalı). Lisans: MIT © 2026 Mustafa Karatüm (atıf metadatasında ü ile + ORCID 0009-0006-7053-2872).
 - Zenodo: v1.0.0 arşivlendi, DOI [10.5281/zenodo.23297412](https://doi.org/10.5281/zenodo.23297412) (README rozetleri ve `CITATION.cff` içinde).
   Yeni sürümler GitHub release'iyle otomatik arşivlenir; `.zenodo.json` ve `CITATION.cff` içindeki sürümü güncelle.
