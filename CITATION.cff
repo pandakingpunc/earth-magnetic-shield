@@ -11,8 +11,14 @@ date-released: 2026-11-03
 license: MIT
 repository-code: "https://github.com/pandakingpunc/earth-magnetic-shield"
 url: "https://pandakingpunc.github.io/earth-magnetic-shield/"
-doi: 10.5281/zenodo.23297412
+doi: 10.5281/zenodo.23920100
 identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23920100
+    description: Zenodo arşivi (v1.1.0)
+  - type: doi
+    value: 10.5281/zenodo.23297411
+    description: Tüm sürümler (concept DOI)
   - type: doi
     value: 10.5281/zenodo.23297412
     description: Zenodo arşivi (v1.0.0)

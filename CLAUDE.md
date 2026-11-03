@@ -54,5 +54,5 @@ yakalanmaz; mümkünse tarayıcıda konsolu kontrol et.
 ## Git
 
 - Depo: https://github.com/pandakingpunc/earth-magnetic-shield (açık, `main` dalı). Lisans: MIT © 2026 Mustafa Karatüm (atıf metadatasında ü ile + ORCID 0009-0006-7053-2872).
-- Zenodo: v1.0.0 arşivlendi, DOI [10.5281/zenodo.23297412](https://doi.org/10.5281/zenodo.23297412) (README rozetleri ve `CITATION.cff` içinde).
+- Zenodo: concept DOI [10.5281/zenodo.23297411](https://doi.org/10.5281/zenodo.23297411); v1.1.0 = 10.5281/zenodo.23920100, v1.0.0 = 10.5281/zenodo.23297412 (README rozetleri ve `CITATION.cff` içinde).
   Yeni sürümler GitHub release'iyle otomatik arşivlenir; `.zenodo.json` ve `CITATION.cff` içindeki sürümü güncelle.

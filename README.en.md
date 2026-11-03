@@ -2,7 +2,7 @@
 
 **Live demo:** https://pandakingpunc.github.io/earth-magnetic-shield/
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23297412.svg)](https://doi.org/10.5281/zenodo.23297412)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23297411.svg)](https://doi.org/10.5281/zenodo.23297411)
 
 # 🌍 Manyetik Kalkan (Magnetic Shield) — Earth's Magnetosphere Simulation
 
@@ -100,7 +100,9 @@ docs/        architecture and module contracts
 
 If you use this software, please cite it as follows (details: [CITATION.cff](CITATION.cff)):
 
-> Karatüm, M. (2026). *Earth Magnetic Shield (Manyetik Kalkan): Interactive 3D Magnetosphere and Space-Weather Simulation* (Version 1.0.0) [Computer software]. Zenodo. [https://doi.org/10.5281/zenodo.23297412](https://doi.org/10.5281/zenodo.23297412)
+> Karatüm, M. (2026). *Earth Magnetic Shield (Manyetik Kalkan): Interactive 3D Magnetosphere and Space-Weather Simulation* (Version 1.1.0) [Computer software]. Zenodo. [https://doi.org/10.5281/zenodo.23920100](https://doi.org/10.5281/zenodo.23920100)
+
+> All versions (concept DOI): [https://doi.org/10.5281/zenodo.23297411](https://doi.org/10.5281/zenodo.23297411)
 
 ## License
 

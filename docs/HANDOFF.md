@@ -1,6 +1,6 @@
 # Devir: sıradaki görevler
 
-**v1.1 (3 Kasım 2026, yerel, henüz pushlanmadı):** canlı NOAA uzay havası modu, otomatik kalite, paylaşım bağlantısı, ekran görüntüsü (P), klavye/erişilebilirlik, WebGL bağlam kaybı uyarısı, dil değişiminde ayarların korunması, reset/önayar/parlama sınıfı düzeltmeleri, three.js ayrı parça, GitHub Pages + CI workflow, yazar adı Karatüm + ORCID. 115 test. Kalan: kullanıcı onayıyla push → Pages'i etkinleştir (Settings → Pages → GitHub Actions) → sürümü 1.1.0 yap → release → Zenodo yeni sürüm DOI'si README/CITATION'a.
+**v1.1.0 (3 Kasım 2026, yayında):** canlı NOAA uzay havası modu, otomatik kalite, paylaşım bağlantısı, ekran görüntüsü (P), klavye/erişilebilirlik, WebGL bağlam kaybı uyarısı, reset/önayar/parlama düzeltmeleri, three.js ayrı parça, Pages + CI, yazar Karatüm + ORCID. 115 test. Site https://pandakingpunc.github.io/earth-magnetic-shield/ , release v1.1.0, Zenodo v1.1.0 DOI 10.5281/zenodo.23920100 (concept 10.5281/zenodo.23297411).
 
 **Durum (11 Ekim 2026):** Dört görevin tamamı bitti. Zenodo DOI: [10.5281/zenodo.23297412](https://doi.org/10.5281/zenodo.23297412).
 
