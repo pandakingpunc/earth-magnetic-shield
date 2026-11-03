@@ -21,7 +21,7 @@ describe('bildirimler', () => {
   beforeEach(setupDom);
 
   it('aynı kategorideki art arda yükselmeler (S3 → S4 → S5) tek bildirimde birleşir; günlük hepsini tutar', async () => {
-    const state = createState();
+    const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
     const events = new EventBus();
     const { createLog } = await import('../src/ui/log.js');
     const log = createLog({ state, events });
@@ -64,7 +64,7 @@ describe('arayüz (HUD, üst çubuk)', () => {
   beforeEach(setupDom);
 
   async function build() {
-    const state = createState();
+    const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
     const events = new EventBus();
     const sim = new SpaceWeatherSim(state, events);
     state.perf = { fps: 60 };

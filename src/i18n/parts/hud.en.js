@@ -10,6 +10,8 @@ export default {
   'hud.live.sim': 'Simulation',
   'hud.live.paused': 'Paused',
   'hud.live.title': 'Not real data; model output',
+  'hud.live.on': 'LIVE',
+  'hud.live.onTitle': 'Solar wind is driven by live NOAA SWPC data; results are still simplified model output',
   'hud.card.toggle': 'Collapse / expand card',
   'hud.card.infoTitle': '{title}: details',
   'hud.card.infoAria': 'More information about {title}',

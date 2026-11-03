@@ -6,13 +6,20 @@ import { QUIET_SOLAR_WIND, LAYER_DEFAULTS } from './constants.js';
 
 export const HISTORY_HOURS = 96;
 export const HISTORY_STEP_HOURS = 0.25;
+export const DEFAULT_STORM_STRENGTH = 0.5;
 
-export function createState() {
+/** Varsayılan başlangıç: şu an (UTC), tam dakikaya yuvarlanmış. */
+function nowEpochMinute() {
+  return Math.floor(Date.now() / 60000) * 60000;
+}
+
+/** opts.startEpochMs: başlangıç anını sabitler (testler tekrarlanabilir olsun diye). */
+export function createState({ startEpochMs = nowEpochMinute() } = {}) {
   return {
     time: {
       simHours: 0,
-      // Simülasyon başlangıç anı (UTC, ms). Varsayılan: 11 Ekim 2026 12:00 UT
-      startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0),
+      // Simülasyon başlangıç anı (UTC, ms). Varsayılan: şu an (tam dakika)
+      startEpochMs,
       timeScale: 0.25, // sim saati / gerçek saniye
       visualSpeed: 1, // parçacık animasyon hızı çarpanı
       paused: false,
@@ -26,7 +33,7 @@ export function createState() {
       fieldStrength: 1, // dipol momenti çarpanı (0..2)
       polarity: 1, // +1 bugünkü, −1 ters
       realisticTilt: true, // dipol ekseni dönme ekseninden ~9.4° eğik
-      stormStrength: 0.5, // sonraki fırtına gücü (0..1)
+      stormStrength: DEFAULT_STORM_STRENGTH, // sonraki fırtına gücü (0..1)
       stormPresetId: null, // null → özel güç
       autoTimeWarp: true, // CME yolculuğunda zamanı hızlandır
       cosmic: {
@@ -36,6 +43,7 @@ export function createState() {
         particle: 'proton', // 'proton' | 'electron' | 'alpha'
       },
       layers: { ...LAYER_DEFAULTS },
+      quality: 'auto', // 'auto' | 'high' | 'medium' | 'low' (oluşturma kalitesi; main.js uygular)
     },
 
     // Etkin (fırtına katkıları eklenmiş) güneş rüzgârı
@@ -108,6 +116,11 @@ export function createState() {
     },
 
     log: [], // { simHours, level, text }
+
+    // Canlı uzay havası (NOAA SWPC): status 'idle' | 'loading' | 'ok' | 'error'
+    live: { on: false, status: 'idle', lastFetchMs: 0, sample: null, error: null },
+
+    perf: { fps: 60, quality: 'high' }, // quality: etkin kalite düzeyi (params.quality 'auto' iken otomatik seçilen)
   };
 }
 

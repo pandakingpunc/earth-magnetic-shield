@@ -123,7 +123,7 @@ describe('İngilizce arayüz (lang=en)', () => {
       setPixelRatio() {},
       getSize: (v) => v.set(1600, 900),
     };
-    const state = createState();
+    const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
     state.perf = { fps: 60 };
     const events = new EventBus();
     const sim = new SpaceWeatherSim(state, events);

@@ -281,7 +281,7 @@ export function createPanel(ctx) {
 
     const trigger = el('button', {
       class: 'pn-btn pn-btn--primary pn-btn--storm pn-btn--block', type: 'button', text: t('panel.storm.trigger'),
-      title: t('panel.storm.triggerTitle'),
+      title: t('panel.storm.triggerTitle'), 'aria-keyshortcuts': 'F',
       onclick: () => sim.triggerSolarStorm({ strength: state.params.stormStrength, presetId: null }),
     });
 
@@ -439,7 +439,7 @@ export function createPanel(ctx) {
 
     const fire = el('button', {
       class: 'pn-btn pn-btn--primary pn-btn--cosmic pn-btn--block', type: 'button', text: t('panel.cosmic.fire'),
-      title: t('panel.cosmic.fireTitle'),
+      title: t('panel.cosmic.fireTitle'), 'aria-keyshortcuts': 'K',
       onclick: () => sim.triggerCosmicBurst(),
     });
 
@@ -497,7 +497,56 @@ export function createPanel(ctx) {
       eff: () => effText(state.sw.by, w.by, 'nT', 1, 0.2),
     });
 
-    body.append(speed.root, density.root, bz.root, by.root);
+    // --- Canlı veri (NOAA SWPC): açıkken elle kaydırıcılar devre dışı kalır
+    const lv = state.live;
+    const liveSw = toggle(t('panel.live.toggle'), {
+      get: () => lv.on,
+      set: (on) => sim.setLiveMode(on),
+      cls: 'pn-switch--live',
+    });
+    liveSw.root.title = t('panel.live.toggleTitle');
+    const liveStat = el('div', { class: 'pn-sub pn-live-stat', hidden: true });
+    const liveKp = el('div', { class: 'pn-sub pn-live-stat', hidden: true });
+    const liveRetry = el('button', {
+      class: 'pn-btn pn-btn--block', type: 'button', text: t('panel.live.retry'), hidden: true,
+      onclick: () => ctx.ui?.refreshLive?.(),
+    });
+    const liveInfo = el('button', {
+      class: 'pn-link', type: 'button', text: t('panel.live.about'), onclick: () => openInfo('liveData'),
+    });
+    const driven = [speed, density, bz, by];
+    const syncLive = () => {
+      for (const c of driven) {
+        if (c.input.disabled !== lv.on) c.input.disabled = lv.on;
+        c.root.classList.toggle('is-driven', lv.on);
+      }
+      setHidden(liveStat, !lv.on);
+      setHidden(liveRetry, !(lv.on && lv.status === 'error'));
+      if (!lv.on) {
+        setHidden(liveKp, true);
+        return;
+      }
+      const smp = lv.sample;
+      let text;
+      if (lv.status === 'error') {
+        text = smp ? t('panel.live.errorKept') : t('panel.live.error');
+      } else if (!smp) {
+        text = t('panel.live.loading');
+      } else {
+        const ageMin = Math.max(0, Math.round((Date.now() - (smp.windTime || lv.lastFetchMs)) / 60000));
+        const age = ageMin < 1 ? t('panel.live.ageNow') : t('panel.live.age', { n: ageMin });
+        text = t('panel.live.status', { src: smp.source || '—', age });
+      }
+      setText(liveStat, text);
+      liveStat.classList.toggle('is-warn', lv.status === 'error');
+      const showKp = !!smp && Number.isFinite(smp.kpObserved);
+      setHidden(liveKp, !showKp);
+      if (showKp) setText(liveKp, t('panel.live.kp', { obs: nf(smp.kpObserved, 1), sim: nf(state.derived.kp, 1) }));
+    };
+    syncers.push(syncLive);
+    events.on('live:update', requestSync);
+
+    body.append(liveSw.root, liveStat, liveKp, liveRetry, speed.root, density.root, bz.root, by.root, liveInfo);
   }
 
   // ================================================================ 4. Manyetik alan
@@ -550,7 +599,7 @@ export function createPanel(ctx) {
 
     const revBtn = el('button', {
       class: 'pn-btn pn-btn--reversal pn-btn--block', type: 'button', text: t('panel.field.reversal'),
-      title: t('panel.field.reversalTitle'),
+      title: t('panel.field.reversalTitle'), 'aria-keyshortcuts': 'T',
       onclick: () => sim.startPoleReversal(),
     });
     const revFill = el('i');
@@ -620,6 +669,34 @@ export function createPanel(ctx) {
       list.appendChild(sw.root);
     }
     body.appendChild(list);
+
+    // Grafik kalitesi: Otomatik | Yüksek | Orta | Düşük (main.js uygular; 'auto' iken etkin düzey etikette görünür)
+    const qSeg = el('div', { class: 'pn-seg', role: 'radiogroup', 'aria-label': t('misc.quality.title') });
+    const qBtns = ['auto', 'high', 'medium', 'low'].map((key) => {
+      const b = el('button', {
+        type: 'button', role: 'radio', 'aria-checked': 'false', text: t(`misc.quality.${key}`),
+        onclick: () => {
+          state.params.quality = key;
+          syncQ();
+        },
+      });
+      b.dataset.key = key;
+      qSeg.appendChild(b);
+      return b;
+    });
+    const syncQ = () => {
+      const cur = state.params.quality;
+      for (const b of qBtns) {
+        const on = b.dataset.key === cur ? 'true' : 'false';
+        if (b.getAttribute('aria-checked') !== on) b.setAttribute('aria-checked', on);
+        if (b.dataset.key === 'auto') {
+          const eff = state.perf?.quality;
+          setText(b, cur === 'auto' && eff ? t('misc.quality.autoEff', { level: t(`misc.quality.${eff}`) }) : t('misc.quality.auto'));
+        }
+      }
+    };
+    syncers.push(syncQ);
+    body.append(el('div', { class: 'pn-subhead', text: t('misc.quality.title') }), qSeg);
   }
 
   // ================================================================ 6. Kamera
@@ -630,7 +707,7 @@ export function createPanel(ctx) {
     Object.entries(CAMERA_PRESETS).forEach(([name, p], i) => {
       const b = el(
         'button', {
-          class: 'pn-btn', type: 'button',
+          class: 'pn-btn', type: 'button', 'aria-keyshortcuts': String(i + 1),
           onclick: () => {
             ctx.cameraRig?.goTo(name);
             events.emit('camera:preset', { name });
@@ -654,7 +731,13 @@ export function createPanel(ctx) {
       get: () => !!ctx.cameraRig?.autoRotate,
       set: (on) => ctx.cameraRig?.setAutoRotate(on),
     });
-    body.append(grid, rot.root);
+    // Bağlantı kopyala / ekran görüntüsü (üst çubukta dar ekranda gizli olduğundan burada da var)
+    const share = el(
+      'div', { class: 'pn-grid' },
+      el('button', { class: 'pn-btn', type: 'button', text: '🔗 ' + t('misc.topbar.copyLinkAria'), title: t('misc.topbar.copyLinkTitle'), onclick: () => ctx.actions?.copyLink?.() }),
+      el('button', { class: 'pn-btn', type: 'button', text: '📷 ' + t('misc.topbar.shotAria'), title: t('misc.topbar.shotTitle'), 'aria-keyshortcuts': 'P', onclick: () => ctx.actions?.screenshot?.() }),
+    );
+    body.append(grid, rot.root, share);
   }
 
   // ================================================================ 7. Zaman
@@ -673,7 +756,13 @@ export function createPanel(ctx) {
         const secs = 24 / v;
         return t('panel.time.dayAbout', { v: secs < 100 ? `${nf(secs, 0)} ${t('panel.unit.sec')}` : `${nfs(secs / 60, 1)} ${t('panel.unit.min')}` });
       },
-      eff: () => (tm.fastForward ? t('panel.time.warpActive', { rate: fmtRate(tm.effectiveRate) }) : null),
+      eff: () => (state.live.on ? t('panel.time.liveRealtime') : tm.fastForward ? t('panel.time.warpActive', { rate: fmtRate(tm.effectiveRate) }) : null),
+    });
+    // Canlı modda saat gerçek zamanda akar: hız kaydırıcısı kilitli (rüzgâr kaydırıcılarıyla aynı desen)
+    syncers.push(() => {
+      const on = state.live.on;
+      if (scale.input.disabled !== on) scale.input.disabled = on;
+      scale.root.classList.toggle('is-driven', on);
     });
 
     const visual = slider({

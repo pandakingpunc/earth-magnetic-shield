@@ -119,3 +119,12 @@ Kullanıcıya görünen tüm sayılar (HUD, grafikler, uyarı metinleri, sahne e
 - `particles.js`: `borisStep`, `adaptiveStep`, `advanceParticle(p, distance, model, opts)` — yol uzunluğu parametreli göreli Boris itici (`p = {pos, dir, rigidity, charge}`).
 - `indices.js`: Kp, Dst, aurora, NOAA ölçekleri (G5 yalnızca Kp ≈ 9), `impactEstimates`, `riskLabel`, `SCALE_LABELS`; Dst sınıfları için tek tablo `DST_THRESHOLDS` + `dstClass` (HUD, bilgi tablosu ve uyarılar kullanır); `cosmicBlockedFraction(M)` kalkanın engellediği galaktik kozmik ışın oranının analitik tahmini (parçacık sayaçlarından türetilmez).
 - `stormProfile.js`: `STORM_PRESETS` (bsPeak’ler gözlenen Dst’yi üretecek biçimde ayarlı), `stormParamsFromStrength`, `predictStormOutcome` (simülasyonla aynı Dst*/Kp modeli üzerinden zaman tümlevi), `strengthLabel` (beklenen G düzeyinden), `createStorm`, zaman profilleri.
+
+## v1.1 eklemeleri
+
+- `src/core/liveData.js`: NOAA SWPC gerçek zamanlı güneş rüzgârı/IMF/Kp ayrıştırıcıları (saf, testli) + `fetchLiveSpaceWeather()`. `active` kaynağı tercih edilir; zaman etiketleri UTC.
+- `src/ui/live.js`: canlı mod yoklayıcısı (yalnız mod açıkken ve sekme görünürken, 5 dk'da bir). Başlangıçta ağ çağrısı yapılmaz.
+- `ctx.sim.setLiveMode(on, reason?)`, `applyLiveSample(sample)`: canlı modda saat gerçek zamanda akar (`LIVE_RATE`), her örnekte gerçek UTC'ye eşitlenir. El ile fırtına/önayar/senaryo canlı modu kapatır; kozmik patlama kapatmaz.
+- `src/core/viewState.js`: kalite profilleri ve otomatik kalite (`stepAutoQuality`, histerezisli), `?preset=` / `?cam=` URL parametreleri, paylaşım bağlantısı, ekran görüntüsü adı, dil değişiminde ayar anlık görüntüsü (sessionStorage).
+- `ctx.actions` (`copyLink`, `screenshot`): `createUI`'dan ÖNCE boş nesne olarak oluşturulur, sonra doldurulur (UI `ctx`'in sığ kopyasını alır).
+- `state.params.quality` ('auto'|'high'|'medium'|'low'), `state.perf.quality` (etkin düzey), `state.live`.

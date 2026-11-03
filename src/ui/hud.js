@@ -504,8 +504,19 @@ export function createHud(ctx) {
 
     // başlık
     const paused = !!state.time.paused;
-    setText(liveTxt, paused ? t('hud.live.paused') : t('hud.live.sim'));
-    setState(liveDot, paused ? 'warn' : 'ok');
+    const lv = state.live;
+    if (lv && lv.on) {
+      // Canlı veri modu: rozet "CANLI/LIVE"; veri alınamıyorsa sarı
+      setText(liveTxt, paused ? t('hud.live.paused') : t('hud.live.on'));
+      setState(liveDot, paused || lv.status === 'error' ? 'warn' : 'danger');
+      if (live._on !== true) live.title = t('hud.live.onTitle');
+      live._on = true;
+    } else {
+      setText(liveTxt, paused ? t('hud.live.paused') : t('hud.live.sim'));
+      setState(liveDot, paused ? 'warn' : 'ok');
+      if (live._on !== false) live.title = t('hud.live.title');
+      live._on = false;
+    }
     setText(clock, fmtDate(simDate(state)));
 
     // Kp / Dst

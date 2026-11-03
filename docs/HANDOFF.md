@@ -1,5 +1,7 @@
 # Devir: sıradaki görevler
 
+**v1.1 (3 Kasım 2026, yerel, henüz pushlanmadı):** canlı NOAA uzay havası modu, otomatik kalite, paylaşım bağlantısı, ekran görüntüsü (P), klavye/erişilebilirlik, WebGL bağlam kaybı uyarısı, dil değişiminde ayarların korunması, reset/önayar/parlama sınıfı düzeltmeleri, three.js ayrı parça, GitHub Pages + CI workflow, yazar adı Karatüm + ORCID. 115 test. Kalan: kullanıcı onayıyla push → Pages'i etkinleştir (Settings → Pages → GitHub Actions) → sürümü 1.1.0 yap → release → Zenodo yeni sürüm DOI'si README/CITATION'a.
+
 **Durum (11 Ekim 2026):** Dört görevin tamamı bitti. Zenodo DOI: [10.5281/zenodo.23297412](https://doi.org/10.5281/zenodo.23297412).
 
 Bu dosya, projeye yeni bir Claude Code oturumunda devam etmek içindir. Görevleri **sırayla** yap. Her görev

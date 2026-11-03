@@ -10,6 +10,8 @@ export default {
   'hud.live.sim': 'Simülasyon',
   'hud.live.paused': 'Duraklatıldı',
   'hud.live.title': 'Gerçek veri değildir; model çıktısı',
+  'hud.live.on': 'CANLI',
+  'hud.live.onTitle': 'Güneş rüzgârı NOAA SWPC canlı verisinden sürülüyor; sonuçlar yine de basitleştirilmiş model çıktısıdır',
   'hud.card.toggle': 'Kartı daralt / genişlet',
   'hud.card.infoTitle': '{title}: ayrıntılı bilgi',
   'hud.card.infoAria': '{title} hakkında bilgi',

@@ -8,6 +8,7 @@ import { setupShortcuts } from './shortcuts.js';
 import { createHud } from './hud.js';
 import { createCharts } from './charts.js';
 import { createLog } from './log.js';
+import { createLive } from './live.js';
 import { t } from '../i18n/index.js';
 
 export function createUI(ctx) {
@@ -22,8 +23,10 @@ export function createUI(ctx) {
         document.body.classList.toggle('ui-hidden');
       },
       openInfo: (topic) => info.open(topic),
+      refreshLive: () => live.refresh(),
     },
   };
+  const live = createLive(uiCtx);
   const info = createInfo(uiCtx);
   const parts = [
     createTopBar(uiCtx),
@@ -32,6 +35,7 @@ export function createUI(ctx) {
     createCharts(uiCtx),
     createLog(uiCtx),
     info,
+    live,
   ];
   setupShortcuts(uiCtx);
 

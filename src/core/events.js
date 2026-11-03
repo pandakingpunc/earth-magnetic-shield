@@ -14,6 +14,7 @@
 //   'reversal:end'     {}
 //   'preset:applied'   { id, name }
 //   'alert'            { level: 'info'|'warn'|'danger', text, simHours }
+//   'live:update'      { live }                     — canlı veri modu/durumu/örneği değişti
 //   'layers:changed'   { layers }
 //   'camera:preset'    { name }
 //   'sim:reset'        {}

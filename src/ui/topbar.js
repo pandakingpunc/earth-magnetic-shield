@@ -102,7 +102,7 @@ export function createTopBar(ctx) {
   const playIco = el('span', { class: 'tb-ico', 'aria-hidden': 'true' });
   const playLbl = el('span', { class: 'tb-lbl' });
   const playBtn = el('button', {
-    class: 'tb-btn tb-btn--play', type: 'button',
+    class: 'tb-btn tb-btn--play', type: 'button', 'aria-keyshortcuts': 'Space',
     onclick: () => {
       state.time.paused = !state.time.paused;
       syncPlay();
@@ -110,20 +110,31 @@ export function createTopBar(ctx) {
   }, playIco, playLbl);
 
   const resetBtn = el('button', {
-    class: 'tb-btn tb-hide-sm', type: 'button', text: '↺', title: t('misc.topbar.resetTitle'), 'aria-label': t('misc.topbar.resetAria'),
+    class: 'tb-btn tb-hide-sm', type: 'button', text: '↺', 'aria-keyshortcuts': 'Shift+R', title: t('misc.topbar.resetTitle'), 'aria-label': t('misc.topbar.resetAria'),
     onclick: () => sim.reset(),
   });
 
   const hideBtn = el('button', {
-    class: 'tb-btn tb-hide-sm', type: 'button', text: '⛶', title: t('misc.topbar.hideTitle'), 'aria-label': t('misc.topbar.hideAria'), 'aria-pressed': 'false',
+    class: 'tb-btn tb-hide-sm', type: 'button', text: '⛶', 'aria-keyshortcuts': 'H', title: t('misc.topbar.hideTitle'), 'aria-label': t('misc.topbar.hideAria'), 'aria-pressed': 'false',
     onclick: () => {
       ctx.ui?.toggleHidden?.();
       syncHide();
     },
   });
 
+  // Paylaşım bağlantısı ve ekran görüntüsü (eylemler main.js'te ctx.actions'a bağlanır; yoksa sessiz geçer)
+  const linkBtn = el('button', {
+    class: 'tb-btn tb-hide-md', type: 'button', text: '🔗', title: t('misc.topbar.copyLinkTitle'), 'aria-label': t('misc.topbar.copyLinkAria'),
+    onclick: () => ctx.actions?.copyLink?.(),
+  });
+  const shotBtn = el('button', {
+    class: 'tb-btn tb-hide-md', type: 'button', text: '📷', title: t('misc.topbar.shotTitle'), 'aria-label': t('misc.topbar.shotAria'),
+    'aria-keyshortcuts': 'P',
+    onclick: () => ctx.actions?.screenshot?.(),
+  });
+
   const infoBtn = el('button', {
-    class: 'tb-btn', type: 'button', text: '?', title: t('misc.topbar.infoTitle'), 'aria-label': t('misc.topbar.infoAria'),
+    class: 'tb-btn', type: 'button', text: '?', 'aria-keyshortcuts': 'I', title: t('misc.topbar.infoTitle'), 'aria-label': t('misc.topbar.infoAria'),
     onclick: () => openInfo('controls'), // I / ? kısayolu ve panel alt bilgisiyle aynı sayfa ('Model ve kaynaklar' bilgi penceresinde sekme)
   });
 
@@ -147,7 +158,7 @@ export function createTopBar(ctx) {
   const hudDrawer = drawer(hudEl, [panelEl, logEl], '📊', t('misc.topbar.drawer.hud'));
   const logDrawer = drawer(logEl, [panelEl, hudEl], '📜', t('misc.topbar.drawer.log')); // telefonda olay günlüğüne erişim
 
-  const right = el('div', { class: 'tb-right' }, fps, panelDrawer, hudDrawer, logDrawer, playBtn, resetBtn, hideBtn, infoBtn, createLangSwitch('right'));
+  const right = el('div', { class: 'tb-right' }, fps, panelDrawer, hudDrawer, logDrawer, playBtn, resetBtn, linkBtn, shotBtn, hideBtn, infoBtn, createLangSwitch('right'));
 
   root.append(left, center, right);
 

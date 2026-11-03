@@ -155,8 +155,14 @@ export function flareClassName(flux) {
     ['B', 1e-7],
     ['A', 1e-8],
   ];
-  for (const [letter, base] of classes) {
-    if (flux >= base) return `${letter}${(flux / base).toFixed(1)}`;
+  // Patlama sınıfları iki dilde de '.' kullanır (uluslararası gösterim, ör. M5.2)
+  for (let i = 0; i < classes.length; i++) {
+    const [letter, base] = classes[i];
+    if (flux < base) continue;
+    const m = Math.round((flux / base) * 10) / 10;
+    // 9.96 → 10.0 olmasın: bir üst sınıfa terfi (X açık uçlu, X28 meşru)
+    if (m >= 10 && i > 0) return `${classes[i - 1][0]}1.0`;
+    return `${letter}${m.toFixed(1)}`;
   }
   return 'A0.0';
 }

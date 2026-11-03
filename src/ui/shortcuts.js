@@ -2,7 +2,8 @@
 // Esc ile bilgi penceresini kapatma info.js içindedir.
 //
 //   Boşluk duraklat/devam · F fırtına · K kozmik ışın patlaması · T kutup tersinmesi
-//   1–7 kamera önayarları · H arayüzü gizle · L etiketler · I veya ? yardım · Shift+R sıfırla
+//   1–7 kamera önayarları · H arayüzü gizle · L etiketler · I veya ? yardım · Shift+R sıfırla · P ekran görüntüsü
+//   (Ok tuşları yalnızca odaktaki 3B tuvalde görünümü kaydırır: main.js → controls.listenToKeyEvents(canvas))
 
 import { CAMERA_PRESETS } from '../scene/cameraRig.js';
 
@@ -60,6 +61,10 @@ export function setupShortcuts(ctx) {
       case 'ı':
       case '?':
         ctx.ui?.openInfo?.('controls');
+        return;
+      case 'p':
+      case 'P':
+        ctx.actions?.screenshot?.();
         return;
       case 'r':
       case 'R':

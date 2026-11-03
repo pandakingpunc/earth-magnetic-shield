@@ -198,7 +198,7 @@ describe('simülasyon motoru (uçtan uca)', () => {
   };
 
   it('Carrington fırtınası: süper fırtına, GEO maruz, Türkiye’den aurora', () => {
-    const state = createState();
+    const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
     const events = new EventBus();
     const seen = new Set();
     for (const ev of ['flare', 'storm:launched', 'storm:arrived', 'sep:onset']) events.on(ev, () => seen.add(ev));
@@ -222,7 +222,7 @@ describe('simülasyon motoru (uçtan uca)', () => {
   });
 
   it('Gannon 2024 fırtınası Dst −300…−550 aralığında', () => {
-    const state = createState();
+    const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
     const sim = new SpaceWeatherSim(state, new EventBus());
     state.time.timeScale = 1;
     sim.applyPreset('gannon2024');
@@ -236,7 +236,7 @@ describe('simülasyon motoru (uçtan uca)', () => {
   });
 
   it('sakin koşullarda kararlı', () => {
-    const state = createState();
+    const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
     const sim = new SpaceWeatherSim(state, new EventBus());
     run(sim, 20);
     expect(state.derived.kp).toBeLessThan(3);
@@ -246,7 +246,7 @@ describe('simülasyon motoru (uçtan uca)', () => {
   });
 
   it('kutup tersinmesi kutupluluğu çevirir ve süreklidir', () => {
-    const state = createState();
+    const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
     const sim = new SpaceWeatherSim(state, new EventBus());
     sim.startPoleReversal();
     let minShield = 9;
@@ -262,7 +262,7 @@ describe('simülasyon motoru (uçtan uca)', () => {
   });
 
   it('mevsim: Haziran gündönümünde kuzey ekseni Güneş’e eğik', () => {
-    const state = createState();
+    const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
     const sim = new SpaceWeatherSim(state, new EventBus());
     sim.setDayOfYear(172);
     expect(state.frame.spinAxis.x).toBeGreaterThan(0.39);
@@ -271,7 +271,7 @@ describe('simülasyon motoru (uçtan uca)', () => {
   });
 
   it('İstanbul’un manyetik enlemi makul (~36-40°)', () => {
-    const state = createState();
+    const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
     new SpaceWeatherSim(state, new EventBus());
     expect(state.derived.istanbulMagLat).toBeGreaterThan(34);
     expect(state.derived.istanbulMagLat).toBeLessThan(41);
@@ -280,7 +280,7 @@ describe('simülasyon motoru (uçtan uca)', () => {
 
 describe('kalkansız Dünya', () => {
   it('alan yokken Türkiye için aurora uyarısı verilmez', () => {
-    const state = createState();
+    const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
     const sim = new SpaceWeatherSim(state, new EventBus());
     sim.applyPreset('noShield');
     for (let i = 0; i < 300; i++) sim.update(1 / 30);
@@ -293,7 +293,7 @@ describe('kalkansız Dünya', () => {
 
 describe('fırtına sınırı', () => {
   it('aynı anda en fazla 6 fırtına', () => {
-    const state = createState();
+    const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
     const sim = new SpaceWeatherSim(state, new EventBus());
     for (let i = 0; i < 10; i++) sim.triggerSolarStorm({ strength: 0.3 });
     expect(state.storms.length).toBe(6);

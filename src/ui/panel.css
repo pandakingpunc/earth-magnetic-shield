@@ -1422,3 +1422,14 @@ body.ui-hidden #panel {
     padding: 3px 6px;
   }
 }
+
+/* --- Canlı veri (NOAA SWPC) */
+.pn-ctl.is-driven {
+  opacity: 0.6;
+}
+.pn-ctl.is-driven .pn-range {
+  cursor: not-allowed;
+}
+.pn-live-stat {
+  margin: 2px 0 6px;
+}

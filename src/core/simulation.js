@@ -4,7 +4,7 @@
 
 import * as THREE from 'three';
 import { EARTH, QUIET_SOLAR_WIND, TURKISH_CITIES } from './constants.js';
-import { HISTORY_HOURS, HISTORY_STEP_HOURS, simDate } from './state.js';
+import { HISTORY_HOURS, HISTORY_STEP_HOURS, DEFAULT_STORM_STRENGTH, simDate } from './state.js';
 import { latLonToLocal, localToWorld, magneticLatitudeDeg, DEG, clamp } from './geo.js';
 import { nf, nint } from './format.js';
 import { t } from '../i18n/index.js';
@@ -20,10 +20,14 @@ import {
 
 const SUBSTEP_HOURS = 0.05;
 const MAX_ACTIVE_STORMS = 6;
+const LIVE_RATE = 1 / 3600; // canlı modda sim saati / gerçek saniye
 const KP_BIN_HOURS = 0.1; // son 24 saatin en büyük Kp'si için sim-saati kovası (kare hızından bağımsız)
 const FLARE_HOLD_SEC = 4; // patlama tepesi rozet/HUD’da en az bu kadar gerçek saniye görünür (zaman hızlanmasına rağmen)
 const FLARE_FADE_SEC = 1.5; // bekleme süresinin son kısmında yumuşak sönüm
+/** Canlı verinin sıkıştırıldığı aralıklar (panel kaydırıcılarıyla aynı) */
+export const LIVE_RANGES = { speed: [250, 1000], density: [1, 50], by: [-20, 20], bz: [-30, 30] };
 const _Y = new THREE.Vector3(0, 1, 0);
+const _Z = new THREE.Vector3(0, 0, 1);
 
 /** Fırtına dışı senaryolar */
 const scenario = (id) => ({
@@ -66,19 +70,30 @@ export class SpaceWeatherSim {
     this._flareHold = 0; // kalan bekleme (gerçek sn)
     this._istLocal = latLonToLocal(TURKISH_CITIES[0].lat, TURKISH_CITIES[0].lon, 1);
     this._istWorld = new THREE.Vector3();
+    this._tiltAxis = new THREE.Vector3(); // tersinme sırasında kare başına yeniden kullanılır
+    this._crossTmp = new THREE.Vector3();
+    this._sw = { speed: 0, density: 0, by: 0, bz: 0 }; // _effectiveWind çıktısı (yeniden kullanılır)
 
-    events.on('cosmic:impact', (e) => {
-      const st = this.state.cosmic.stats;
-      st.impacts++;
-      if (Math.abs(e.magLatDeg) >= 55) st.polarImpacts++;
-      else if (Math.abs(e.magLatDeg) < 30) st.equatorialImpacts++;
-    });
-    events.on('cosmic:escaped', () => {
-      this.state.cosmic.stats.escaped++;
-    });
+    this._offs = [
+      events.on('cosmic:impact', (e) => {
+        const st = this.state.cosmic.stats;
+        st.impacts++;
+        if (Math.abs(e.magLatDeg) >= 55) st.polarImpacts++;
+        else if (Math.abs(e.magLatDeg) < 30) st.equatorialImpacts++;
+      }),
+      events.on('cosmic:escaped', () => {
+        this.state.cosmic.stats.escaped++;
+      }),
+    ];
 
     this._computeFrame();
     this._substep(0, true);
+  }
+
+  /** Olay dinleyicilerini kaldırır */
+  dispose() {
+    for (const off of this._offs) off();
+    this._offs = [];
   }
 
   // ------------------------------------------------------------------ tetikleyiciler
@@ -90,6 +105,7 @@ export class SpaceWeatherSim {
       this.alert('warn', t('alert.maxStorms', { max: MAX_ACTIVE_STORMS }));
       return null;
     }
+    if (s.live.on) this.setLiveMode(false, 'scenario'); // elle senaryo sıkıştırılmış zaman kullanır
     const storm = createStorm({ strength, presetId: presetId || null, launchSim: s.time.simHours });
     s.storms.push(storm);
     this.events.emit('flare', { storm, flareClass: storm.flareClass, rScale: storm.rScale });
@@ -149,18 +165,22 @@ export class SpaceWeatherSim {
   applyPreset(id) {
     const s = this.state;
     if (STORM_PRESETS[id]) {
+      // Önce tetikle: en çok fırtına sınırında yalnızca o uyarı çıksın, önayar bildirimi yanıltmasın
+      const storm = this.triggerSolarStorm({ presetId: id });
+      if (!storm) return null;
       this.events.emit('preset:applied', { id, name: STORM_PRESETS[id].name });
       this.alert('info', t('alert.preset', { name: STORM_PRESETS[id].name, description: STORM_PRESETS[id].description }));
-      return this.triggerSolarStorm({ presetId: id });
+      return storm;
     }
     const sc = SCENARIOS[id];
     if (!sc) return null;
+    if (s.live.on) this.setLiveMode(false, 'scenario');
     const sw = s.params.solarWind;
     switch (id) {
       case 'quiet':
         Object.assign(sw, QUIET_SOLAR_WIND);
         s.params.fieldStrength = 1;
-        s.storms.length = 0;
+        this._clearStorms(true);
         break;
       case 'highSpeedStream':
         Object.assign(sw, { speed: 750, density: 3, by: 5, bz: -3 });
@@ -180,35 +200,56 @@ export class SpaceWeatherSim {
     return null;
   }
 
+  /** Fırtınaları ve onlardan türeyen durumu (Dst, Kp penceresi, kuşaklar, patlama tutması) temizler.
+   *  emitEnded: aktif her fırtına için storm:ended yayınla (reset() sessiz kalır, sim:reset zaten var). */
+  _clearStorms(emitEnded) {
+    const s = this.state;
+    const d = s.derived;
+    if (emitEnded) {
+      for (const st of s.storms) {
+        st.phase = 'ended';
+        this.events.emit('storm:ended', { storm: st });
+      }
+    }
+    s.storms.length = 0;
+    d.dstStar = 0;
+    d.dstMinStorm = 0;
+    this._dstMinRecent = 0;
+    this._outerTarget = 1;
+    d.belts.outer = 1;
+    d.belts.slot = 0;
+    this._kpRecent.length = 0;
+    this._kp = 1.7;
+    this._tailEnergy = 0;
+    this._flarePeak = 0;
+    this._flareHold = 0;
+    this._xrayPrev = 1e-7;
+    // Duraklatılmış olsa bile Dst/Kp/kuşaklar hemen sakin değerlere otursun
+    this._substep(0, true);
+  }
+
+  /** Sıfırlama: UT saati (startEpochMs/simHours), mevsim, katman bayrakları ve dil KORUNUR;
+   *  güneş rüzgârı, alan, fırtına seçimi/gücü ve türetilmiş durum varsayılana döner. */
   reset() {
     const s = this.state;
-    s.storms.length = 0;
+    if (s.live.on) this.setLiveMode(false); // sıfırlama canlı bağı koparır
+    s.params.stormPresetId = null;
+    s.params.stormStrength = DEFAULT_STORM_STRENGTH;
     Object.assign(s.params.solarWind, QUIET_SOLAR_WIND);
     s.params.fieldStrength = 1;
     s.params.polarity = 1;
     s.reversal.active = false;
     s.reversal.progress = 0;
-    s.derived.dstStar = 0;
-    s.derived.dstMinStorm = 0;
-    this._dstMinRecent = 0;
-    this._outerTarget = 1;
-    s.derived.belts.outer = 1;
-    s.derived.belts.slot = 0;
-    this._kp = 1.7;
-    this._kpRecent.length = 0;
-    this._tailEnergy = 0;
     s.derived.substormCount = 0;
     this._substormAge = 99;
     s.derived.reconnection.nightside = 0;
-    this._flarePeak = 0;
-    this._flareHold = 0;
-    this._xrayPrev = 1e-7;
     Object.assign(s.cosmic.stats, { spawned: 0, impacts: 0, escaped: 0, polarImpacts: 0, equatorialImpacts: 0 });
     for (const k of Object.keys(s.history)) s.history[k].length = 0;
     this._nextSample = s.time.simHours;
     this._flags = { g: 0, geo: false, turkey: false, dst100: false, dst250: false, dst600: false, dst850: false, sep: 0, shieldOff: false };
-    // Duraklatılmış olsa bile türetilmiş değerler ve bir geçmiş örneği hemen tazelensin
-    this._substep(0, true);
+    // Fırtına kalıntılarını temizle; türetilmiş değerler ve bir geçmiş örneği hemen tazelensin
+    this._clearStorms(false);
+    this._updateRate(); // duraklatılmışken de fastForward/effectiveRate doğru olsun
     this.events.emit('sim:reset', {});
     this.alert('info', t('alert.reset'));
   }
@@ -220,6 +261,76 @@ export class SpaceWeatherSim {
     this.state.log.push(entry);
     if (this.state.log.length > 200) this.state.log.shift();
     this.events.emit('alert', entry);
+  }
+
+  // ------------------------------------------------------------------ canlı uzay havası
+
+  /** Canlı mod: güneş rüzgârı NOAA SWPC verisinden sürülür. Açarken alan gücü 1 olur ve saat gerçek ana eşitlenir;
+   *  kapatınca mevcut değerler kalır, güncelleme durur. Veri çekimi arayüz denetleyicisindedir (ui/live.js). */
+  setLiveMode(on, reason = null) {
+    const lv = this.state.live;
+    on = !!on;
+    if (lv.on === on) return;
+    lv.on = on;
+    this._liveLoaded = false;
+    this._liveErrAlertMs = 0;
+    if (on) {
+      const s = this.state;
+      lv.status = 'loading';
+      lv.error = null;
+      s.params.fieldStrength = 1;
+      s.time.startEpochMs = Date.now() - s.time.simHours * 3600e3; // simDate == şimdi (hız değişmez)
+      this._computeFrame();
+      this.alert('info', t('alert.live.on'));
+    } else {
+      lv.status = 'idle';
+      this.alert('info', t(reason === 'scenario' ? 'alert.live.paused' : 'alert.live.off'));
+    }
+    this._updateRate(); // canlıyken saat gerçek zamanda akar; çıkınca kullanıcı hızı geri gelir
+    this.events.emit('live:update', { live: lv });
+  }
+
+  /** Yeni örneği uygular: kaydırıcı aralıklarına sıkıştırır, state.params.solarWind'e yazar */
+  applyLiveSample(sample) {
+    const lv = this.state.live;
+    if (!lv.on || !sample) return;
+    const sw = this.state.params.solarWind;
+    const set = (key, v, lo, hi) => {
+      if (Number.isFinite(v)) sw[key] = clamp(v, lo, hi);
+    };
+    set('speed', sample.speed, LIVE_RANGES.speed[0], LIVE_RANGES.speed[1]);
+    set('density', sample.density, LIVE_RANGES.density[0], LIVE_RANGES.density[1]);
+    set('by', sample.by, LIVE_RANGES.by[0], LIVE_RANGES.by[1]);
+    set('bz', sample.bz, LIVE_RANGES.bz[0], LIVE_RANGES.bz[1]);
+    lv.sample = sample;
+    lv.status = 'ok';
+    lv.error = null;
+    lv.lastFetchMs = Date.now();
+    // Saati gerçek UTC'ye yeniden eşitle (simHours değişmez → grafiklerde sıçrama olmaz)
+    this.state.time.startEpochMs = Date.now() - this.state.time.simHours * 3600e3;
+    if (!this._liveLoaded) {
+      this._liveLoaded = true;
+      this.alert('info', t('alert.live.loaded', {
+        v: nint(sw.speed), n: nf(sw.density, 1), bz: nf(sw.bz, 1), src: sample.source || '—',
+      }));
+    }
+    this.events.emit('live:update', { live: lv });
+  }
+
+  /** Çekim durumu: 'loading' ya da hata ('error', err). Hatada son iyi değerler korunur; uyarı en çok 30 dakikada bir */
+  setLiveStatus(status, err = null) {
+    const lv = this.state.live;
+    if (!lv.on) return;
+    lv.status = status;
+    if (status === 'error') {
+      lv.error = err ? String(err.message || err) : 'error';
+      const nowMs = Date.now();
+      if (nowMs - (this._liveErrAlertMs || 0) > 30 * 60e3) {
+        this._liveErrAlertMs = nowMs;
+        this.alert('warn', t('alert.live.error'));
+      }
+    }
+    this.events.emit('live:update', { live: lv });
   }
 
   // ------------------------------------------------------------------ ana döngü
@@ -248,21 +359,7 @@ export class SpaceWeatherSim {
       }
     }
 
-    // Etkin zaman hızı: yolda olan CME varsa zamanı hızlandır
-    let rate = tm.timeScale;
-    tm.fastForward = false;
-    if (s.params.autoTimeWarp) {
-      for (const st of s.storms) {
-        if (!st.arrived) {
-          const r = st.transitHours / st.visualTransitSec;
-          if (r > rate) {
-            rate = r;
-            tm.fastForward = true;
-          }
-        }
-      }
-    }
-    tm.effectiveRate = rate;
+    const rate = this._updateRate();
     const simDt = realDt * rate;
 
     // Patlama tepesi bekleme süresi gerçek zamanla azalır; bitince tutulan tepe bırakılır
@@ -281,10 +378,41 @@ export class SpaceWeatherSim {
 
   // ------------------------------------------------------------------ iç hesaplar
 
+  /** Etkin zaman hızı: yolda olan CME varsa zamanı hızlandır (tm.fastForward/effectiveRate günceller) */
+  _updateRate() {
+    const s = this.state;
+    const tm = s.time;
+    let rate = tm.timeScale;
+    tm.fastForward = false;
+    if (s.live.on) {
+      // Canlı mod: saat gerçek zamanda (1 sim saati = 3600 gerçek sn); zaman hızı ve CME hızlandırması yok sayılır
+      tm.effectiveRate = LIVE_RATE;
+      return LIVE_RATE;
+    }
+    if (s.params.autoTimeWarp) {
+      for (const st of s.storms) {
+        if (!st.arrived) {
+          const r = st.transitHours / st.visualTransitSec;
+          if (r > rate) {
+            rate = r;
+            tm.fastForward = true;
+          }
+        }
+      }
+    }
+    tm.effectiveRate = rate;
+    return rate;
+  }
+
+  /** Dönen nesne her çağrıda yeniden kullanılır; çağıran yalnızca anında okur (state.sw'ye kopyalanır) */
   _effectiveWind(now) {
     const s = this.state;
     const base = s.params.solarWind;
-    const sw = { speed: base.speed, density: base.density, by: base.by, bz: base.bz };
+    const sw = this._sw;
+    sw.speed = base.speed;
+    sw.density = base.density;
+    sw.by = base.by;
+    sw.bz = base.bz;
     let bestW = 0;
     for (const st of s.storms) {
       const c = stormSolarWindAt(st, now - st.arrivalSim, base);
@@ -308,6 +436,7 @@ export class SpaceWeatherSim {
     const now = s.time.simHours;
 
     // --- Fırtına evreleri
+    let anyEnded = false;
     for (const st of s.storms) {
       const tArr = now - st.arrivalSim;
       st.transitProgress = clamp((now - st.launchSim) / st.transitHours, 0, 1);
@@ -323,8 +452,17 @@ export class SpaceWeatherSim {
           this.alert('info', t('alert.stormEnded', { name: st.name }));
         }
       }
+      if (st.phase === 'ended') anyEnded = true;
     }
-    s.storms = s.storms.filter((st) => st.phase !== 'ended');
+    if (anyEnded) {
+      // Yerinde sıkıştır: dizi kimliği korunur, yeni dizi ayrılmaz
+      let w = 0;
+      for (let i = 0; i < s.storms.length; i++) {
+        const st = s.storms[i];
+        if (st.phase !== 'ended') s.storms[w++] = st;
+      }
+      s.storms.length = w;
+    }
 
     // --- Güneş rüzgârı
     const sw = this._effectiveWind(now);
@@ -594,9 +732,9 @@ export class SpaceWeatherSim {
       // Sanal jeomanyetik kutup bir meridyen boyunca güneye gezinir
       const p = s.reversal.progress;
       const swing = Math.PI * p;
-      const tiltAxis = new THREE.Vector3(0, 0, 1).cross(local).lengthSq() > 1e-6
-        ? new THREE.Vector3().crossVectors(local, new THREE.Vector3(0, 0, 1)).normalize()
-        : new THREE.Vector3(1, 0, 0);
+      const tiltAxis = this._tiltAxis;
+      if (this._crossTmp.copy(_Z).cross(local).lengthSq() > 1e-6) tiltAxis.crossVectors(local, _Z).normalize();
+      else tiltAxis.set(1, 0, 0);
       this._qRev.setFromAxisAngle(tiltAxis, swing + 0.35 * Math.sin(p * 9.0) * Math.sin(Math.PI * p));
       local.applyQuaternion(this._qRev);
       // p > 0.5'te eksen güney yarımküreye geçer: eksen ters çevrilip moment işareti değişir (bkz. _substep)

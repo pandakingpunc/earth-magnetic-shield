@@ -10,7 +10,7 @@ import { predictStormOutcome, stormParamsFromStrength, strengthLabel } from '../
 import { nf, nfs, nfSigned, nint } from '../src/core/format.js';
 
 const mk = () => {
-  const state = createState();
+  const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
   const events = new EventBus();
   const sim = new SpaceWeatherSim(state, events);
   return { state, events, sim };

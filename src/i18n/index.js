@@ -42,6 +42,23 @@ export function applyDocumentLang() {
   document.title = t('app.title');
 }
 
+const beforeReload = [];
+
+/** Dil değişimiyle sayfa yeniden yüklenmeden hemen önce çalışacak kanca (ör. oturum anlık görüntüsünü kaydet). */
+export function onBeforeLangReload(fn) {
+  if (typeof fn === 'function') beforeReload.push(fn);
+}
+
+export function runBeforeLangReload() {
+  for (const fn of beforeReload) {
+    try {
+      fn();
+    } catch {
+      /* anlık görüntü isteğe bağlı */
+    }
+  }
+}
+
 /**
  * Dili değiştir. Varsayılan: kaydet, URL'deki ?lang'ı güncelle ve sayfayı yeniden yükle.
  * { reload: false } yalnızca bellekteki dili değiştirir (testler için).
@@ -61,6 +78,7 @@ export function setLang(lang, { reload = true } = {}) {
   }
   const loc = globalThis.location;
   if (!loc) return;
+  runBeforeLangReload();
   const url = new URL(loc.href);
   if (url.searchParams.has('lang')) {
     url.searchParams.set('lang', l);

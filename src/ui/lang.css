@@ -146,3 +146,10 @@
     transition: none;
   }
 }
+
+/* Bağlantı kopyala / ekran görüntüsü düğmeleri: ≤1000 px'te sağ grubu taşırmasın diye gizlenir (panelin Kamera bölümünde de var) */
+@media (max-width: 1000px) {
+  .tb-hide-md {
+    display: none;
+  }
+}

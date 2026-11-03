@@ -59,7 +59,7 @@ function makeCtx(textures) {
     setPixelRatio() {},
     getSize: (v) => v.set(1600, 900),
   };
-  const state = createState();
+  const state = createState({ startEpochMs: Date.UTC(2026, 9, 11, 12, 0, 0) });
   const events = new EventBus();
   const sim = new SpaceWeatherSim(state, events);
   const cameraRig = new CameraRig(camera, controls);
